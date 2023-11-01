@@ -1,7 +1,9 @@
-import './App.css'
-import Popup from 'reactjs-popup'
 import {Component} from 'react'
+import Popup from 'reactjs-popup'
 import 'reactjs-popup/dist/index.css'
+import './App.css'
+
+import ImageButton from './components/ImageButton'
 
 const choicesList = [
   {
@@ -27,24 +29,21 @@ class App extends Component {
     result: '',
     yourChoice: '',
     opponentChoice: '',
-    isClickedChoiceButton: false,
     currentScore: 0,
+    isClickedChoiceButton: false,
+    isClickedPlayButton: true,
   }
 
   onClickPlayButton = () => {
-    this.setState(prevState => ({
-      isClickedChoiceButton: !prevState.isClickedChoiceButton,
-    }))
+    this.setState({isClickedChoiceButton: false, isClickedPlayButton: true})
   }
 
-  onClickChoiceButton = event => {
-    this.setState(prevState => ({
-      isClickedChoiceButton: !prevState.isClickedChoiceButton,
-    }))
-    const yourChoice = event.target.alt
-    const value = Math.floor(Math.random() * 3)
-    console.log(value)
-    const opponentChoice = choicesList[value].id
+  onClickImage = imageId => {
+    this.setState({isClickedChoiceButton: true, isClickedPlayButton: false})
+    const yourChoice = imageId
+
+    const randomValue = Math.floor(Math.random() * 3)
+    const opponentChoice = choicesList[randomValue].id
 
     if (
       (yourChoice === 'ROCK' && opponentChoice === 'SCISSORS') ||
@@ -79,28 +78,15 @@ class App extends Component {
     }
   }
 
-  renderPlayingView = () => (
-    <div className="play-container">
-      {choicesList.map(eachChoice => (
-        <div key={eachChoice.id}>
-          <button
-            type="button"
-            onClick={this.onClickChoiceButton}
-            data-testid={`${eachChoice.id.toLowerCase()}Button`}
-          >
-            <img
-              src={eachChoice.imageUrl}
-              alt={eachChoice.id}
-              className="choice-image"
-            />
-          </button>
-        </div>
-      ))}
-    </div>
-  )
-
-  renderResultView = () => {
-    const {yourChoice, opponentChoice, result} = this.state
+  render() {
+    const {
+      isClickedChoiceButton,
+      score,
+      yourChoice,
+      opponentChoice,
+      result,
+      isClickedPlayButton,
+    } = this.state
 
     const yourChoiceData = choicesList.filter(
       eachChoice => eachChoice.id === yourChoice,
@@ -108,38 +94,6 @@ class App extends Component {
     const opponentChoiceData = choicesList.filter(
       eachChoice => eachChoice.id === opponentChoice,
     )
-
-    return (
-      <div className="result-container">
-        <div className="game-result-view">
-          <div>
-            <img
-              src={yourChoiceData[0].imageUrl}
-              alt="your choice"
-              className="choice-image"
-            />
-            <p>Your Choice</p>
-          </div>
-          <div>
-            <img
-              src={opponentChoiceData[0].imageUrl}
-              alt="opponent choice"
-              className="choice-image"
-            />
-            <p>Opponent Choice</p>
-          </div>
-        </div>
-        <p>{result}</p>
-        <button type="button" onClick={this.onClickPlayButton}>
-          PLAY AGAIN
-        </button>
-      </div>
-    )
-  }
-
-  render() {
-    const {isClickedChoiceButton, score, currentScore} = this.state
-    const scoreDisplay = isClickedChoiceButton ? currentScore : score
     return (
       <div className="app-container">
         <div>
@@ -149,12 +103,47 @@ class App extends Component {
             </div>
             <div className="score-container">
               <p>Score</p>
-              <p className="score">{scoreDisplay}</p>
+              <p className="score">{score}</p>
             </div>
           </div>
-          {isClickedChoiceButton
-            ? this.renderResultView()
-            : this.renderPlayingView()}
+          {isClickedPlayButton ? (
+            <div className="play-container">
+              {choicesList.map(eachChoice => (
+                <ImageButton
+                  choiceDetails={eachChoice}
+                  key={eachChoice.id}
+                  onClickImage={this.onClickImage}
+                />
+              ))}
+            </div>
+          ) : null}
+
+          {isClickedChoiceButton ? (
+            <div className="result-container">
+              <div className="game-result-view">
+                <div>
+                  <img
+                    src={yourChoiceData[0].imageUrl}
+                    alt="your choice"
+                    className="choice-image"
+                  />
+                  <p>Your Choice</p>
+                </div>
+                <div>
+                  <img
+                    src={opponentChoiceData[0].imageUrl}
+                    alt="opponent choice"
+                    className="choice-image"
+                  />
+                  <p>Opponent Choice</p>
+                </div>
+              </div>
+              <p>{result}</p>
+              <button type="button" onClick={this.onClickPlayButton}>
+                PLAY AGAIN
+              </button>
+            </div>
+          ) : null}
         </div>
         <div className="popup-container">
           <Popup

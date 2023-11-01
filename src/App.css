@@ -37,11 +37,6 @@ body {
   border-radius: 25px;
 }
 
-.choice-image {
-  height: 100px;
-  width: 100px;
-}
-
 .play-container {
   display: flex;
   justify-content: space-around;
@@ -78,7 +73,7 @@ body {
 }
 
 .score {
-  font-weight: Roboto;
+  font-family: 'Roboto';
 }
 
 .result-container {
